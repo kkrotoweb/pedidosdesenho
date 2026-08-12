@@ -1,23 +1,24 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canal de Desenhos - Pedidos</title>
+    <title>Canal de Desenhos - Consulta Pública</title>
     
-    <!-- Tailwind CSS para estilização rápida e responsiva -->
+    <!-- Tailwind CSS para estilização moderna, limpa e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome para os ícones -->
+    <!-- FontAwesome para ícones expressivos e limpos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SheetJS para ler e criar arquivos Excel (.xlsx) -->
+    <!-- SheetJS (xlsx) para leitura e interpretação local de arquivos XLSX -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
-    <!-- Fonte Inter do Google Fonts -->
+    <!-- Fonte Inter do Google Fonts para excelente legibilidade -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Configuração de cores do Tailwind e Estilos Customizados (CSS) -->
+    <!-- Configuração de identidade visual e cores do Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -27,8 +28,8 @@
                         brand: {
                             50: '#f5f3ff',
                             100: '#ede9fe',
-                            500: '#8b5cf6', // Roxo principal
-                            600: '#7c3aed', // Roxo escuro para hover
+                            500: '#8b5cf6', // Roxo principal da marca Canal de Desenhos
+                            600: '#7c3aed', // Roxo escuro para estados ativos/hover
                             900: '#4c1d95',
                         }
                     }
@@ -37,25 +38,22 @@
         }
     </script>
     <style>
+        /* Estilos customizados e suporte de scroll */
         body {
             background-color: #f8fafc;
             color: #0f172a;
         }
-        
-        /* Personalização da barra de rolagem */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Animações suaves */
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Linha de corte de texto (reticências) para títulos muito grandes */
         .truncate-2-lines {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -63,15 +61,15 @@
             overflow: hidden;
         }
 
-        /* Efeito de vidro para a notificação */
         .glass-toast {
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.92);
             backdrop-filter: blur(8px);
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans">
 
+    <!-- Cabeçalho Institucional -->
     <header class="bg-gradient-to-r from-brand-900 via-brand-600 to-brand-500 text-white shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -83,12 +81,12 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold tracking-tight" id="app-title">Canal de Desenhos</h1>
-                        <p class="text-brand-100 text-sm">Gerenciador de Pedidos</p>
+                        <p class="text-brand-100 text-sm">Catálogo Público de Consulta</p>
                     </div>
                 </div>
 
-                <!-- Contadores -->
-                <div class="flex gap-4 text-sm font-medium">
+                <!-- Contadores Dinâmicos -->
+                <div class="flex gap-3 text-sm font-medium">
                     <div class="bg-white/10 px-4 py-2 rounded-lg flex flex-col items-center">
                         <span class="text-brand-100 text-xs uppercase tracking-wider">Fila</span>
                         <span class="text-xl font-bold" id="count-fila">0</span>
@@ -106,168 +104,95 @@
         </div>
     </header>
 
+    <!-- Corpo Principal -->
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         
-        <!-- Controles Superiores -->
+        <!-- Controles Superiores: Importação XLSX e Barra de Pesquisa -->
         <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
             
-            <!-- Barra de Busca -->
+            <!-- Barra de Busca Inteligente (Fuzzy Search) -->
             <div class="relative w-full md:w-1/2 lg:w-1/3">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
                 </div>
-                <input type="text" id="input-busca" placeholder="🔎 Procurar pedido, pessoa..." 
-                    class="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all text-sm">
+                <input type="text" id="input-busca" placeholder="🔎 Procurar título ou pessoa..." disabled
+                    class="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl leading-5 bg-slate-100 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all text-sm disabled:cursor-not-allowed">
             </div>
 
-            <!-- Botões de Ação -->
+            <!-- Botão Único de Alimentação: Importar XLSX -->
             <div class="flex flex-wrap gap-2 w-full md:w-auto justify-center">
-                <button onclick="abrirModalFormulario()" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-3 rounded-xl font-medium shadow-md shadow-brand-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5">
-                    <i class="fa-solid fa-plus"></i> NOVO PEDIDO
-                </button>
-                <button onclick="exportarXLSX()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 rounded-xl font-medium shadow-md shadow-emerald-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5">
-                    <i class="fa-solid fa-file-export"></i> EXPORTAR
-                </button>
-                <!-- Input de arquivo invisível para importar -->
-                <input type="file" id="input-importar" accept=".xlsx, .xls" class="hidden" onchange="processarArquivoXLSX(event)">
-                <button onclick="document.getElementById('input-importar').click()" class="bg-slate-700 hover:bg-slate-800 text-white px-5 py-3 rounded-xl font-medium shadow-md shadow-slate-700/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5">
-                    <i class="fa-solid fa-file-import"></i> IMPORTAR
+                <!-- Input invisível para gerenciar o arquivo selecionado -->
+                <input type="file" id="input-importar" accept=".xlsx, .xls" class="hidden" onchange="receberArquivoXLSX(event)">
+                
+                <button onclick="dispararSeletorArquivo()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl font-semibold shadow-md shadow-brand-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-file-excel text-lg"></i> IMPORTAR XLSX
                 </button>
             </div>
         </div>
 
-        <!-- Abas -->
-        <div class="flex space-x-1 bg-slate-200/50 p-1 rounded-xl mb-6 w-full max-w-sm mx-auto md:mx-0">
-            <button id="tab-pending" onclick="mudarAba('pending')" class="w-full py-2.5 text-sm font-medium rounded-lg transition-all text-brand-600 bg-white shadow">
-                <i class="fa-solid fa-list mr-2"></i>Pedidos
-            </button>
-            <button id="tab-not_found" onclick="mudarAba('not_found')" class="w-full py-2.5 text-sm font-medium rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
-                <i class="fa-solid fa-ghost mr-2"></i>Não Encontrados
-            </button>
+        <!-- Controles de Aba e Ordenação -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+            
+            <!-- Abas (Pedidos vs Não Encontrados) -->
+            <div class="flex space-x-1 bg-slate-200/50 p-1 rounded-xl w-full sm:w-auto">
+                <button id="tab-pending" onclick="mudarAba('pending')" class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all text-brand-600 bg-white shadow">
+                    <i class="fa-solid fa-list mr-2"></i>Pedidos na Fila
+                </button>
+                <button id="tab-not_found" onclick="mudarAba('not_found')" class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
+                    <i class="fa-solid fa-ghost mr-2"></i>Não Encontrados
+                </button>
+            </div>
+
+            <!-- Seletor de Ordenação (Somente Consulta) -->
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Ordenar:</span>
+                <select id="select-ordenacao" onchange="mudarOrdenacao(this.value)" class="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <option value="alfabetica">Alfabética (A-Z)</option>
+                    <option value="reversa">Alfabética (Z-A)</option>
+                    <option value="antigos">Mais Antigos</option>
+                    <option value="recentes">Mais Recentes</option>
+                </select>
+            </div>
         </div>
 
-        <!-- Onde os cards serão injetados pelo JavaScript -->
+        <!-- Grade Onde os Cards Serão Exibidos -->
         <div id="grid-pedidos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Cards entrarão aqui -->
+            <!-- Os cards injetados via script aparecerão aqui -->
         </div>
 
-        <!-- Estado Vazio (Mostrado quando não há pedidos) -->
-        <div id="estado-vazio" class="hidden flex flex-col items-center justify-center py-20 text-center fade-in">
-            <div class="bg-slate-100 p-6 rounded-full mb-4">
-                <i class="fa-solid fa-box-open text-4xl text-slate-400"></i>
+        <!-- Estado Inicial / Vazio (Antes de importar ou se nenhum resultado corresponder à busca) -->
+        <div id="estado-vazio" class="flex flex-col items-center justify-center py-24 text-center fade-in">
+            <div class="bg-brand-50 p-6 rounded-full mb-4 border border-brand-100">
+                <i class="fa-solid fa-file-arrow-up text-4xl text-brand-500"></i>
             </div>
-            <h3 class="text-lg font-medium text-slate-900 mb-1">Nenhum pedido encontrado</h3>
-            <p class="text-slate-500 max-w-sm">Adicione um novo pedido ou tente pesquisar por outro termo.</p>
+            <h3 class="text-xl font-bold text-slate-800 mb-2" id="vazio-titulo">Nenhuma lista foi carregada</h3>
+            <p class="text-slate-500 max-w-md mx-auto mb-6 text-sm" id="vazio-texto">
+                Para começar a consultar os desenhos, clique no botão <b>IMPORTAR XLSX</b> acima e selecione o arquivo gerado pela versão de cadastro.
+            </p>
+            <button onclick="dispararSeletorArquivo()" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-all shadow-md">
+                <i class="fa-solid fa-file-excel mr-2"></i> Importar Planilha Agora
+            </button>
         </div>
 
     </main>
 
-    <!-- Modal de Formulário (Adicionar/Editar) -->
-    <div id="modal-form" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <!-- Adicionado overflow-y-auto no content para permitir rolagem caso a tela seja pequena e os campos não caibam -->
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="modal-form-content">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 flex-shrink-0">
-                <h2 class="text-xl font-bold text-slate-800" id="modal-titulo">Novo Pedido</h2>
-                <button onclick="fecharModalFormulario()" class="text-slate-400 hover:text-slate-600 transition-colors">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
-            
-            <form id="form-pedido" class="p-6 space-y-4 overflow-y-auto flex-grow" onsubmit="salvarPedido(event)">
-                <input type="hidden" id="form-id">
-                <input type="hidden" id="form-status" value="pending">
-                
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Título do Conteúdo *</label>
-                    <input type="text" id="form-titulo" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" placeholder="Ex: Scooby-Doo">
-                </div>
-
-                <!-- NOVO CAMPO: Ano de Lançamento -->
-                <!-- EXPLICAÇÃO: Campo inserido para armazenar especificamente o ano de lançamento do desenho, como solicitado. -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Ano de lançamento</label>
-                    <input type="number" id="form-ano" min="1900" max="2100" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" placeholder="Ex: 1969">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Pedido por *</label>
-                    <input type="text" id="form-pessoa" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" placeholder="Ex: João">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Data do Pedido *</label>
-                    <input type="date" id="form-data" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">URL da Imagem de Capa</label>
-                    <input type="url" id="form-imagem" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 mb-2" placeholder="https://..." oninput="atualizarPreviewImagem()">
-                    
-                    <!-- Preview da Imagem -->
-                    <div class="h-32 bg-slate-100 rounded-lg border border-slate-200 overflow-hidden relative flex items-center justify-center group">
-                        <img id="form-preview" src="" alt="Preview" class="w-full h-full object-cover hidden">
-                        <div id="form-preview-placeholder" class="text-slate-400 flex flex-col items-center text-sm">
-                            <i class="fa-regular fa-image text-2xl mb-1"></i>
-                            <span>Pré-visualização</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- NOVO CAMPO: Comentários -->
-                <!-- EXPLICAÇÃO: Textarea permite que o usuário digite várias linhas livremente. Ele não é obrigatório. -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Comentários</label>
-                    <textarea id="form-comentarios" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 resize-y" placeholder="Procurar versão dublada em português..."></textarea>
-                </div>
-
-                <div class="pt-4 flex gap-3 flex-shrink-0">
-                    <button type="button" onclick="fecharModalFormulario()" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancelar</button>
-                    <button type="submit" class="flex-1 px-4 py-2 bg-brand-500 text-white rounded-lg font-medium hover:bg-brand-600 transition-colors shadow-md shadow-brand-500/30">Salvar Pedido</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação Genérica (Exclusão, Importação) -->
-    <div id="modal-confirmacao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center transform scale-95 opacity-0 transition-all duration-300" id="modal-confirm-content">
-            <div id="modal-confirm-icon" class="w-16 h-16 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
-                <i class="fa-solid fa-triangle-exclamation text-2xl text-red-500"></i>
-            </div>
-            <h3 id="modal-confirm-titulo" class="text-xl font-bold text-slate-800 mb-2">Tem certeza?</h3>
-            <p id="modal-confirm-msg" class="text-slate-500 mb-6 text-sm">Essa ação não poderá ser desfeita.</p>
-            
-            <!-- Botões Extras para Importação -->
-            <div id="modal-confirm-extra-botoes" class="hidden flex-col gap-2 mb-4">
-                <button id="btn-import-mesclar" class="w-full py-2 bg-brand-50 text-brand-700 border border-brand-200 rounded-lg font-medium hover:bg-brand-100 transition-colors text-sm">Adicionar aos atuais (Mesclar)</button>
-            </div>
-
-            <div class="flex gap-3">
-                <button onclick="fecharModalConfirmacao()" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancelar</button>
-                <button id="btn-confirm-action" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors shadow-md shadow-red-500/30">Confirmar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- NOVA FUNCIONALIDADE: Modal de Detalhes (Leitura) -->
-    <!-- EXPLICAÇÃO: Esta estrutura visual forma a janela que aparece quando clicamos em um card.
-         O evento 'onclick' na div principal permite fechar a janela caso o usuário clique na área escura (fora da janela branca). -->
+    <!-- Modal de Detalhes (Leitura) -->
     <div id="modal-detalhes" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target === this) fecharModalDetalhes()">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] flex flex-col overflow-hidden transform scale-95 opacity-0 transition-all duration-300 relative" id="modal-detalhes-content">
             
-            <!-- Botão Fechar Flutuante -->
+            <!-- Botão Fechar -->
             <button onclick="fecharModalDetalhes()" class="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/80 text-white w-8 h-8 rounded-full flex items-center justify-center transition-colors backdrop-blur-md border border-white/20">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <!-- Área de Conteúdo Rolável. O flex-col no mobile e md:flex-row no desktop garantem a responsividade -->
+            <!-- Conteúdo Rolável -->
             <div class="overflow-y-auto flex-grow flex flex-col md:flex-row">
-                <!-- Coluna da Imagem -->
+                <!-- Capa -->
                 <div class="md:w-5/12 h-64 md:h-auto bg-slate-900 relative flex-shrink-0">
-                    <img id="detalhe-imagem" src="" alt="Capa do Desenho" class="w-full h-full object-cover">
+                    <img id="detalhe-imagem" src="" alt="Capa" class="w-full h-full object-cover">
                 </div>
                 
-                <!-- Coluna das Informações -->
+                <!-- Informações -->
                 <div class="p-6 md:w-7/12 flex flex-col bg-white">
                     <h2 id="detalhe-titulo" class="text-2xl font-bold text-slate-800 mb-1 leading-tight">Título</h2>
                     <p id="detalhe-ano" class="text-brand-600 font-bold mb-6 text-sm bg-brand-50 inline-block px-3 py-1 rounded-full w-max">Ano: </p>
@@ -306,11 +231,9 @@
                         </div>
                     </div>
                     
-                    <!-- Seção de Comentários -->
-                    <!-- EXPLICAÇÃO: Este container fica oculto caso o pedido não possua comentários. -->
+                    <!-- Comentários (Oculto se vazio) -->
                     <div id="detalhe-comentarios-container" class="mt-2 pt-5 border-t border-slate-100 hidden">
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3"><i class="fa-regular fa-comment-dots mr-1"></i> Comentários</h3>
-                        <!-- A classe 'whitespace-pre-wrap' é fundamental aqui: ela diz ao navegador para respeitar as quebras de linha exatas que o usuário digitou no campo de texto -->
                         <div id="detalhe-comentarios" class="whitespace-pre-wrap text-slate-700 text-sm bg-slate-50 p-4 rounded-xl border border-slate-100 leading-relaxed italic"></div>
                     </div>
                 </div>
@@ -318,328 +241,322 @@
         </div>
     </div>
 
-    <!-- Toast de Notificação -->
+    <!-- Modal de Confirmação (Substituir lista existente) -->
+    <div id="modal-confirmacao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center transform scale-95 opacity-0 transition-all duration-300" id="modal-confirm-content">
+            <div class="w-16 h-16 mx-auto rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-triangle-exclamation text-2xl text-amber-600"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Substituir lista?</h3>
+            <p class="text-slate-500 mb-6 text-sm">Já existe uma lista carregada. Deseja substituir os dados atuais pelo novo arquivo?</p>
+            
+            <div class="flex gap-3">
+                <button onclick="fecharModalConfirmacao()" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors">Cancelar</button>
+                <button id="btn-confirmar-substituicao" class="flex-1 px-4 py-2 bg-brand-500 text-white rounded-lg font-medium hover:bg-brand-600 transition-colors shadow-md shadow-brand-500/30">Substituir lista</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificações Toast -->
     <div id="toast" class="fixed bottom-5 right-5 glass-toast text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 pointer-events-none">
         <i id="toast-icon" class="fa-solid fa-check-circle text-emerald-400 text-lg"></i>
-        <span id="toast-msg" class="font-medium text-sm">Ação realizada!</span>
+        <span id="toast-msg" class="font-medium text-sm">Operação realizada!</span>
     </div>
 
     <script>
         // =====================================================
-        // CONFIGURAÇÕES DA APLICAÇÃO
+        // 40. CONFIGURAÇÕES DA APLICAÇÃO PÚBLICA
+        // Aqui você pode alterar parâmetros gerais do sistema.
         // =====================================================
         const CONFIG = {
             NOME_APLICACAO: "Canal de Desenhos",
+            // Similaridade mínima exigida pelo algoritmo de busca aproximada (0.0 a 1.0)
             SIMILARIDADE_MINIMA: 0.45, 
-            IMAGEM_PADRAO: "https://placehold.co/400x600/e2e8f0/64748b?text=Sem+Capa",
-            NOME_ARQUIVO_EXPORTACAO: "Canal_de_Desenhos_Pedidos.xlsx"
+            // Imagem padrão exibida caso a capa do desenho esteja ausente ou falhe ao carregar
+            IMAGEM_PADRAO: "https://placehold.co/400x600/e2e8f0/64748b?text=Sem+Capa"
         };
 
         // =====================================================
-        // VARIÁVEIS GLOBAIS DE ESTADO
+        // 41. ARQUITETURA DE ESTADO GLOBAL
+        // Armazena os dados na memória da sessão do navegador.
         // =====================================================
-        let pedidos = []; 
-        let abaAtual = 'pending'; 
-        let termoBusca = ''; 
-        let debounceTimer; 
+        let todosPedidos = [];       // Lista completa de pedidos importados do XLSX
+        let abaAtual = 'pending';    // Aba ativa atual ('pending' para fila ou 'not_found' para não encontrados)
+        let termoBusca = '';         // Termo digitado pelo usuário na barra de pesquisa
+        let ordenacaoAtual = 'alfabetica'; // Critério de ordenação ativo
+        let debounceTimer;           // Temporizador para otimizar o desempenho da busca (debounce)
+        let arquivoPendenteCache = null; // Armazena temporariamente novo arquivo XLSX durante confirmação
 
+        // Inicializa o título da página ao carregar a janela
         document.getElementById('app-title').innerText = CONFIG.NOME_APLICACAO;
-        document.title = `${CONFIG.NOME_APLICACAO} - Pedidos`;
+        document.title = `${CONFIG.NOME_APLICACAO} - Consulta Pública`;
 
-        // =====================================================
-        // EVENTOS GLOBAIS (Teclado)
-        // =====================================================
-        // Fecha qualquer modal ativo se o usuário apertar a tecla ESC
+        // Atalho de teclado ESC para fechar modais abertos
         document.addEventListener('keydown', function(event) {
             if (event.key === "Escape") {
-                fecharModalFormulario();
-                fecharModalConfirmacao();
                 fecharModalDetalhes();
+                fecharModalConfirmacao();
             }
         });
 
         // =====================================================
-        // INICIALIZAÇÃO DA APLICAÇÃO
+        // 6. SELETOR E 27. LEITURA DE ARQUIVO XLSX (SheetJS)
+        // Esta função aciona o seletor oculto de arquivos do computador.
         // =====================================================
-        window.onload = function() {
-            carregarDadosLocal();
-            configurarEventosBusca();
-            renderizarInterface();
-        };
+        function dispararSeletorArquivo() {
+            document.getElementById('input-importar').click();
+        }
 
-        function carregarDadosLocal() {
-            try {
-                const dadosSalvos = localStorage.getItem('canalDesenhosPedidos');
-                if (dadosSalvos) {
-                    pedidos = JSON.parse(dadosSalvos);
+        // =====================================================
+        // 9. & 37. IMPORTAÇÃO ROBUSTA E TRATAMENTO DE DUPLICIDADE
+        // Processa o arquivo selecionado e valida sua estrutura.
+        // =====================================================
+        function receberArquivoXLSX(evento) {
+            const arquivo = evento.target.files[0];
+            if (!arquivo) return;
+
+            // Limpa o input para permitir importar o mesmo arquivo novamente se necessário
+            evento.target.value = '';
+
+            // Verifica se já existem dados carregados; se sim, pede confirmação antes de sobrescrever
+            if (todosPedidos.length > 0) {
+                arquivoPendenteCache = arquivo;
+                abrirModalConfirmacao();
+                return;
+            }
+
+            processarArquivoXLSXReal(arquivo);
+        }
+
+        function abrirModalConfirmacao() {
+            const modal = document.getElementById('modal-confirmacao');
+            const content = document.getElementById('modal-confirm-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            document.getElementById('btn-confirmar-substituicao').onclick = function() {
+                fecharModalConfirmacao();
+                if (arquivoPendenteCache) {
+                    processarArquivoXLSXReal(arquivoPendenteCache);
+                    arquivoPendenteCache = null;
                 }
-            } catch (erro) {
-                console.error("Erro ao carregar dados salvos:", erro);
-                mostrarNotificacao("Erro ao carregar dados antigos.", "erro");
-                pedidos = [];
-            }
+            };
         }
 
-        function salvarDadosLocal() {
-            try {
-                localStorage.setItem('canalDesenhosPedidos', JSON.stringify(pedidos));
-                atualizarContadores();
-            } catch (erro) {
-                console.error("Erro ao salvar dados:", erro);
-                mostrarNotificacao("O limite do navegador foi atingido. Faça um backup XLSX!", "erro");
-            }
+        function fecharModalConfirmacao() {
+            const modal = document.getElementById('modal-confirmacao');
+            const content = document.getElementById('modal-confirm-content');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
         }
 
+        function processarArquivoXLSXReal(arquivo) {
+            const leitor = new FileReader();
+            
+            leitor.onload = function(e) {
+                try {
+                    const dadosBinarios = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(dadosBinarios, { type: 'array' });
+                    
+                    if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+                        mostrarNotificacao("O arquivo XLSX está vazio ou corrompido.", "erro");
+                        return;
+                    }
+
+                    const primeiraAba = workbook.SheetNames[0];
+                    const planilha = workbook.Sheets[primeiraAba];
+                    
+                    // Converte a planilha em formato JSON legível, preenchendo células vazias com string vazia
+                    const linhasBrutas = XLSX.utils.sheet_to_json(planilha, { defval: "" });
+                    
+                    if (linhasBrutas.length === 0) {
+                        mostrarNotificacao("A planilha não possui registros gravados.", "erro");
+                        return;
+                    }
+
+                    let listaProcessada = [];
+
+                    linhasBrutas.forEach((linha, indice) => {
+                        // Identifica dinamicamente os nomes das colunas com flexibilidade de maiúsculas/minúsculas e acentos
+                        const chaves = Object.keys(linha);
+                        const encontrarColuna = (termos) => {
+                            const chaveEncontrada = chaves.find(c => {
+                                const cNorm = normalizarTextoCompleto(c);
+                                return termos.some(t => cNorm.includes(t));
+                            });
+                            return chaveEncontrada ? linha[chaveEncontrada] : "";
+                        };
+
+                        const id = encontrarColuna(["id do sistema", "id", "codigo"]) || `item_${indice}`;
+                        const titulo = encontrarColuna(["titulo", "nome", "desenho", "filme"]) || "Sem Título";
+                        const solicitadoPor = encontrarColuna(["pedido por", "solicitado", "usuario", "pessoa"]) || "Desconhecido";
+                        let dataPedido = encontrarColuna(["data"]) || new Date().toISOString().split('T')[0];
+                        
+                        const anoLancamento = encontrarColuna(["ano de lançamento", "ano de lancamento", "ano"]) || "";
+                        const comentarios = encontrarColuna(["comentários", "comentarios", "comentario", "obs", "observacao"]) || "";
+                        const imagem = encontrarColuna(["url", "imagem", "capa", "foto"]) || "";
+                        const statusCru = encontrarColuna(["status", "estado"]) || "";
+
+                        // Padroniza o status lido para os padrões internos do app ('pending' ou 'not_found')
+                        let status = 'pending';
+                        const statusNorm = normalizarTextoCompleto(String(statusCru));
+                        if (statusNorm.includes("nao encontra") || statusNorm.includes("not_found") || statusNorm.includes("naofound")) {
+                            status = 'not_found';
+                        }
+
+                        // Normaliza datas formato DD/MM/YYYY para YYYY-MM-DD se necessário
+                        if (String(dataPedido).includes('/')) {
+                            const partes = String(dataPedido).split('/');
+                            if (partes.length === 3) {
+                                dataPedido = `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
+                            }
+                        }
+
+                        // Proteção XSS básica (removendo tags HTML maliciosas injetadas)
+                        const tituloSeguro = String(titulo).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        const pessoaSegura = String(solicitadoPor).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                        listaProcessada.push({
+                            id,
+                            titulo: tituloSeguro,
+                            solicitadoPor: pessoaSegura,
+                            dataPedido,
+                            anoLancamento: String(anoLancamento),
+                            comentarios: String(comentarios),
+                            imagem: String(imagem),
+                            status
+                        });
+                    });
+
+                    todosPedidos = listaProcessada;
+
+                    // Atualiza a interface, habilita a busca e exibe contadores
+                    document.getElementById('input-busca').disabled = false;
+                    document.getElementById('input-busca').classList.remove('bg-slate-100', 'cursor-not-allowed');
+                    document.getElementById('input-busca').classList.add('bg-slate-50');
+
+                    atualizarContadores();
+                    renderizarInterface();
+
+                    const qtdFila = todosPedidos.filter(p => p.status === 'pending').length;
+                    const qtdNotFound = todosPedidos.filter(p => p.status === 'not_found').length;
+                    mostrarNotificacao(`Arquivo importado com sucesso! ${todosPedidos.length} pedidos carregados (${qtdFila} na fila, ${qtdNotFound} não encontrados).`);
+
+                } catch (erro) {
+                    console.error("Erro ao ler arquivo:", erro);
+                    mostrarNotificacao("Não foi possível carregar este arquivo. Certifique-se de que você está utilizando a planilha exportada pelo Canal de Desenhos.", "erro");
+                }
+            };
+
+            leitor.onerror = function() {
+                mostrarNotificacao("Erro ao ler o arquivo selecionado.", "erro");
+            };
+
+            leitor.readAsArrayBuffer(arquivo);
+        }
+
+        // =====================================================
+        // 13. ABAS E 22. CONTADORES AUTOMÁTICOS
+        // Alterna entre a aba de Pedidos na Fila e Não Encontrados.
+        // =====================================================
         function mudarAba(aba) {
             abaAtual = aba;
-            
             const btnPending = document.getElementById('tab-pending');
             const btnNotFound = document.getElementById('tab-not_found');
 
             if (aba === 'pending') {
-                btnPending.className = "w-full py-2.5 text-sm font-medium rounded-lg transition-all text-brand-600 bg-white shadow";
-                btnNotFound.className = "w-full py-2.5 text-sm font-medium rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50";
+                btnPending.className = "px-6 py-2.5 text-sm font-medium rounded-lg transition-all text-brand-600 bg-white shadow";
+                btnNotFound.className = "px-6 py-2.5 text-sm font-medium rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50";
             } else {
-                btnNotFound.className = "w-full py-2.5 text-sm font-medium rounded-lg transition-all text-brand-600 bg-white shadow";
-                btnPending.className = "w-full py-2.5 text-sm font-medium rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50";
+                btnNotFound.className = "px-6 py-2.5 text-sm font-medium rounded-lg transition-all text-brand-600 bg-white shadow";
+                btnPending.className = "px-6 py-2.5 text-sm font-medium rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50";
             }
 
             renderizarInterface();
         }
 
         function atualizarContadores() {
-            const countFila = pedidos.filter(p => p.status === 'pending').length;
-            const countNotFound = pedidos.filter(p => p.status === 'not_found').length;
+            const countFila = todosPedidos.filter(p => p.status === 'pending').length;
+            const countNotFound = todosPedidos.filter(p => p.status === 'not_found').length;
             
             document.getElementById('count-fila').innerText = countFila;
             document.getElementById('count-not-found').innerText = countNotFound;
-            document.getElementById('count-total').innerText = pedidos.length;
+            document.getElementById('count-total').innerText = todosPedidos.length;
         }
 
-        function renderizarInterface() {
-            const container = document.getElementById('grid-pedidos');
-            const estadoVazio = document.getElementById('estado-vazio');
-            
-            let pedidosFiltrados = pedidos.filter(p => p.status === abaAtual);
-
-            if (termoBusca.trim() !== '') {
-                pedidosFiltrados = executarPesquisaInteligente(pedidosFiltrados, termoBusca);
-            } else {
-                pedidosFiltrados.sort((a, b) => a.titulo.localeCompare(b.titulo));
-            }
-
-            container.innerHTML = '';
-            
-            if (pedidosFiltrados.length === 0) {
-                container.classList.add('hidden');
-                estadoVazio.classList.remove('hidden');
-            } else {
-                container.classList.remove('hidden');
-                estadoVazio.classList.add('hidden');
-
-                pedidosFiltrados.forEach(pedido => {
-                    container.innerHTML += criarHTMLCard(pedido);
-                });
-            }
-
-            atualizarContadores();
+        // =====================================================
+        // 23. FILTROS E ORDENAÇÃO
+        // Altera a forma como os cards são ordenados na tela.
+        // =====================================================
+        function mudarOrdenacao(criterio) {
+            ordenacaoAtual = criterio;
+            renderizarInterface();
         }
 
-        function criarHTMLCard(pedido) {
-            const infoTempo = calcularTempoFila(pedido.dataPedido);
-            let corTempo = "text-slate-500 bg-slate-100";
+        // =====================================================
+        // 21. CÁLCULO DINÂMICO DE TEMPO NA FILA
+        // Calcula exatamente quantos dias, semanas ou meses o item está na fila com base na data atual.
+        // =====================================================
+        function calcularTempoFila(dataIso) {
+            if (!dataIso) return { dias: 0, texto: "Data não informada" };
+            const dataPedido = new Date(dataIso + 'T00:00:00');
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+
+            const diffTempo = hoje - dataPedido;
+            const diffDias = Math.floor(diffTempo / (1000 * 60 * 60 * 24));
+
+            if (diffDias <= 0) return { dias: 0, texto: "Hoje" };
+            if (diffDias === 1) return { dias: 1, texto: "Ontem" };
+            if (diffDias < 7) return { dias: diffDias, texto: `${diffDias} dias na fila` };
             
-            if (infoTempo.dias >= 30) {
-                corTempo = "text-red-700 bg-red-100 border border-red-200";
-            } else if (infoTempo.dias >= 7) {
-                corTempo = "text-amber-700 bg-amber-100 border border-amber-200";
-            } else {
-                corTempo = "text-emerald-700 bg-emerald-100 border border-emerald-200";
-            }
-
-            const imagemUrl = pedido.imagem ? pedido.imagem : CONFIG.IMAGEM_PADRAO;
-            const pId = pedido.id;
-
-            // EXPLICAÇÃO: Adicionamos event.stopPropagation() nos botões. 
-            // Isso evita que o clique no botão de "editar" ou "excluir" seja interpretado também como um clique no card, 
-            // o que acabaria abrindo o modal de detalhes sem querer.
-            const btnMover = abaAtual === 'pending' 
-                ? `<button onclick="event.stopPropagation(); moverPedido('${pId}', 'not_found')" class="flex-1 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition" title="Marcar como não encontrado"><i class="fa-solid fa-ghost"></i> Ocultar</button>`
-                : `<button onclick="event.stopPropagation(); moverPedido('${pId}', 'pending')" class="flex-1 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition" title="Voltar para fila"><i class="fa-solid fa-arrow-rotate-left"></i> Voltar</button>`;
-
-            // O ano é formatado para aparecer de forma compacta caso exista
-            const displayAno = pedido.anoLancamento ? `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs ml-2">${pedido.anoLancamento}</span>` : "";
-
-            // O Card principal agora possui cursor-pointer e a função abrirModalDetalhes no clique.
-            return `
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all fade-in flex flex-col h-full group cursor-pointer hover:border-brand-300" onclick="abrirModalDetalhes('${pId}')">
-                    
-                    <div class="h-48 w-full relative overflow-hidden bg-slate-100">
-                        <img src="${imagemUrl}" alt="Capa de ${pedido.titulo}" 
-                             onerror="this.onerror=null; this.src='${CONFIG.IMAGEM_PADRAO}';"
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        
-                        <div class="absolute top-3 right-3 px-2.5 py-1 rounded-md text-xs font-bold shadow-sm backdrop-blur-md ${corTempo}" title="Pedido feito em: ${formatarDataBR(pedido.dataPedido)}">
-                            <i class="fa-regular fa-clock mr-1"></i> ${infoTempo.texto}
-                        </div>
-                    </div>
-                    
-                    <div class="p-5 flex-grow flex flex-col">
-                        <h3 class="text-lg font-bold text-slate-800 mb-1 truncate-2-lines leading-tight" title="${pedido.titulo}">${pedido.titulo}${displayAno}</h3>
-                        <p class="text-sm text-slate-500 mb-2 flex items-center gap-1.5 mt-auto pt-2">
-                            <i class="fa-regular fa-user text-slate-400"></i>
-                            <span class="truncate">Por: <span class="font-medium text-slate-700">${pedido.solicitadoPor}</span></span>
-                        </p>
-                        
-                        <!-- Ações Administrativas (Protegidas com stopPropagation) -->
-                        <div class="flex gap-2 mt-1 pt-4 border-t border-slate-100">
-                            ${btnMover}
-                            <button onclick="event.stopPropagation(); editarPedido('${pId}')" class="w-10 h-10 flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-200 rounded-lg hover:text-brand-500 hover:border-brand-300 transition" title="Editar">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button onclick="event.stopPropagation(); confirmarExclusao('${pId}', '${pedido.titulo.replace(/'/g, "\\'")}')" class="w-10 h-10 flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-200 rounded-lg hover:text-red-500 hover:border-red-300 transition" title="Excluir">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                        
-                        <!-- Indicação Visual -->
-                        <div class="text-center mt-3 pt-1">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-brand-500 transition-colors">Clique para ver detalhes</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+            const semanas = Math.floor(diffDias / 7);
+            if (semanas === 1) return { dias: diffDias, texto: "1 semana na fila" };
+            if (semanas < 4) return { dias: diffDias, texto: `${semanas} semanas na fila` };
+            
+            const meses = Math.floor(diffDias / 30);
+            if (meses === 1) return { dias: diffDias, texto: "1 mês na fila" };
+            return { dias: diffDias, texto: `${meses} meses na fila` };
         }
 
         function formatarDataBR(dataIso) {
-            if(!dataIso) return "";
-            const [ano, mes, dia] = dataIso.split('-');
-            return `${dia}/${mes}/${ano}`;
-        }
-
-        function calcularTempoFila(dataIso) {
-            const dataPedido = new Date(dataIso + 'T00:00:00'); 
-            const hoje = new Date();
-            hoje.setHours(0,0,0,0);
-
-            const diferencaMilissegundos = hoje - dataPedido;
-            const diferencaDias = Math.floor(diferencaMilissegundos / (1000 * 60 * 60 * 24));
-
-            if (diferencaDias === 0) return { dias: 0, texto: "Hoje" };
-            if (diferencaDias === 1) return { dias: 1, texto: "Ontem" };
-            if (diferencaDias < 7) return { dias: diferencaDias, texto: `${diferencaDias} dias` };
-            
-            const semanas = Math.floor(diferencaDias / 7);
-            if (semanas === 1) return { dias: diferencaDias, texto: "1 semana" };
-            if (semanas < 4) return { dias: diferencaDias, texto: `${semanas} semanas` };
-            
-            const meses = Math.floor(diferencaDias / 30);
-            if (meses === 1) return { dias: diferencaDias, texto: "1 mês" };
-            return { dias: diferencaDias, texto: `${meses} meses` };
+            if (!dataIso) return "";
+            const partes = dataIso.split('-');
+            if (partes.length !== 3) return dataIso;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
         // =====================================================
-        // NOVA FUNCIONALIDADE: MODAL DE DETALHES (VISUALIZAÇÃO)
+        // 16. & 17. ALGORITMO DE NORMALIZAÇÃO E PESQUISA INTELIGENTE (FUZZY SEARCH)
+        // Remove acentos, pontuações, hífens, maiúsculas/minúsculas para equivalência exata.
         // =====================================================
-        
-        /* 
-         * COMO OS DADOS SÃO ENVIADOS PARA O MODAL:
-         * 1. O usuário clica no card, que chama esta função passando o ID único do pedido.
-         * 2. A função vasculha a lista 'pedidos' na memória e encontra os dados completos.
-         * 3. Acessamos cada elemento de texto do modal (pelos IDs) e colamos os dados do pedido lá dentro.
-         * 4. Por segurança, usamos propriedades como '.innerText' e '.textContent', que transformam qualquer código malicioso em texto inofensivo.
-         */
-        function abrirModalDetalhes(id) {
-            const pedido = pedidos.find(p => p.id === id);
-            if (!pedido) return;
-
-            // Injeta os textos comuns
-            document.getElementById('detalhe-imagem').src = pedido.imagem || CONFIG.IMAGEM_PADRAO;
-            document.getElementById('detalhe-titulo').innerText = pedido.titulo;
-            document.getElementById('detalhe-pessoa').innerText = pedido.solicitadoPor;
-            document.getElementById('detalhe-data').innerText = formatarDataBR(pedido.dataPedido);
-            
-            // Onde fica o ano de lançamento no modal:
-            document.getElementById('detalhe-ano').innerText = pedido.anoLancamento ? `Ano: ${pedido.anoLancamento}` : "Ano de lançamento não informado";
-            
-            const infoTempo = calcularTempoFila(pedido.dataPedido);
-            document.getElementById('detalhe-tempo').innerText = infoTempo.texto;
-            
-            const txtStatus = pedido.status === 'pending' ? 'Na fila' : 'Não encontrado';
-            const elStatus = document.getElementById('detalhe-status');
-            elStatus.innerText = txtStatus;
-            
-            // Colorir o status para dar mais destaque
-            elStatus.className = pedido.status === 'pending' 
-                ? "font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded" 
-                : "font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded";
-
-            // Onde fica o campo de comentários no modal e como é tratado de forma segura:
-            const containerComentarios = document.getElementById('detalhe-comentarios-container');
-            const textoComentarios = document.getElementById('detalhe-comentarios');
-
-            if (pedido.comentarios && pedido.comentarios.trim() !== '') {
-                // textContent insere o texto exatamente como digitado.
-                // Como a div tem a classe 'whitespace-pre-wrap' no HTML, as quebras de linha (Enters) que o usuário deu são respeitadas na tela.
-                textoComentarios.textContent = pedido.comentarios; 
-                containerComentarios.classList.remove('hidden'); // Exibe a seção
-            } else {
-                // Se não houver comentários, ocultamos toda a caixinha de comentários, deixando o design mais limpo.
-                containerComentarios.classList.add('hidden');
-                textoComentarios.textContent = "";
-            }
-
-            // Animação de Entrada
-            const modal = document.getElementById('modal-detalhes');
-            const content = document.getElementById('modal-detalhes-content');
-            
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
-
-        /*
-         * COMO O MODAL É FECHADO:
-         * Esta função faz o processo inverso de abrir. Ela inicia uma animação diminuindo o tamanho e apagando o modal,
-         * e após 300 milissegundos (tempo da animação), ela adiciona a classe 'hidden' que efetivamente remove a janela da vista.
-         */
-        function fecharModalDetalhes() {
-            const modal = document.getElementById('modal-detalhes');
-            const content = document.getElementById('modal-detalhes-content');
-            
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
-        // =====================================================
-        // ALGORITMO DE PESQUISA INTELIGENTE (Fuzzy Search)
-        // =====================================================
-        function configurarEventosBusca() {
+        document.addEventListener('DOMContentLoaded', () => {
             const inputBusca = document.getElementById('input-busca');
             inputBusca.addEventListener('input', (e) => {
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => {
                     termoBusca = e.target.value;
                     renderizarInterface();
-                }, 300);
+                }, 250); // Debounce de 250ms para excelente desempenho com milhares de registros
             });
-        }
+        });
 
-        function normalizarTexto(texto) {
+        function normalizarTextoCompleto(texto) {
             if (!texto) return "";
             return texto.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
-                .replace(/[^a-z0-9\s]/g, "") 
-                .replace(/\s+/g, " ") 
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos (ex: á, ç -> a, c)
+                .replace(/[^a-z0-9\s]/g, " ")                    // Substitui hífens e pontuações por espaços
+                .replace(/\s+/g, " ")                            // Remove espaços duplicados
                 .trim();
         }
 
+        // Cálculo de Distância de Levenshtein para semelhança aproximada de palavras
         function calcularLevenshtein(a, b) {
             if (a.length === 0) return b.length;
             if (b.length === 0) return a.length;
@@ -654,9 +571,8 @@
                         matriz[i][j] = matriz[i - 1][j - 1];
                     } else {
                         matriz[i][j] = Math.min(
-                            matriz[i - 1][j - 1] + 1, 
-                            Math.min(matriz[i][j - 1] + 1, 
-                                     matriz[i - 1][j] + 1) 
+                            matriz[i - 1][j - 1] + 1,
+                            Math.min(matriz[i][j - 1] + 1, matriz[i - 1][j] + 1)
                         );
                     }
                 }
@@ -665,264 +581,212 @@
         }
 
         function calcularSimilaridade(str1, str2) {
-            const tamanhoMaximo = Math.max(str1.length, str2.length);
-            if (tamanhoMaximo === 0) return 1.0;
-            const distancia = calcularLevenshtein(str1, str2);
-            return (tamanhoMaximo - distancia) / tamanhoMaximo;
+            const maxLen = Math.max(str1.length, str2.length);
+            if (maxLen === 0) return 1.0;
+            const dist = calcularLevenshtein(str1, str2);
+            return (maxLen - dist) / maxLen;
         }
 
         function executarPesquisaInteligente(lista, termo) {
-            const termoNorm = normalizarTexto(termo);
+            const termoNorm = normalizarTextoCompleto(termo);
             if (termoNorm === '') return lista;
 
             const palavrasBusca = termoNorm.split(' ');
 
-            const resultadosComNota = lista.map(pedido => {
-                const tituloNorm = normalizarTexto(pedido.titulo);
+            const resultadosAvaliados = lista.map(pedido => {
+                const tituloNorm = normalizarTextoCompleto(pedido.titulo);
                 const pessoaNorm = normalizarTexto(pedido.solicitadoPor);
+                const anoNorm = pedido.anoLancamento ? normalizarTextoCompleto(pedido.anoLancamento) : "";
                 
-                // Inclui a pesquisa do ano como requisitado de forma segura (opcional porém recomendada)
-                const anoNorm = pedido.anoLancamento ? normalizarTexto(pedido.anoLancamento.toString()) : "";
-                
-                let notaFinal = 0;
+                let notaRelevancia = 0;
 
-                // Match perfeito detecta inclusive o ano de lançamento se o usuário digitar exatamente (Ex: "1969")
+                // Correspondência exata ou parcial de títulos ou nomes
                 if (tituloNorm.includes(termoNorm) || pessoaNorm.includes(termoNorm) || anoNorm === termoNorm) {
-                    notaFinal = 1.0; 
+                    notaRelevancia = 1.0;
                 } else {
-                    let palavrasEncontradas = 0;
-                    for(let palavra of palavrasBusca) {
-                        if (tituloNorm.includes(palavra) || pessoaNorm.includes(palavra) || anoNorm === palavra) {
-                            palavrasEncontradas++;
+                    let todasEncontradas = true;
+                    for (let pBusca of palavrasBusca) {
+                        if (!tituloNorm.includes(pBusca) && !pessoaNorm.includes(pBusca) && anoNorm !== pBusca) {
+                            todasEncontradas = false;
+                            break;
                         }
                     }
-                    if (palavrasEncontradas === palavrasBusca.length) {
-                        notaFinal = 0.9; 
+                    if (todasEncontradas) {
+                        notaRelevancia = 0.9;
                     } else {
-                        const similaridadeTitulo = calcularSimilaridade(termoNorm, tituloNorm);
+                        // Verifica similaridade aproximada (Fuzzy Search por Levenshtein)
+                        const simTitulo = calcularSimilaridade(termoNorm, tituloNorm);
                         let maxSimPalavra = 0;
                         const palavrasTitulo = tituloNorm.split(' ');
-                        
-                        for (let pBusca of palavrasBusca) {
-                            for (let pTit of palavrasTitulo) {
-                                const sim = calcularSimilaridade(pBusca, pTit);
+                        for (let pb of palavrasBusca) {
+                            for (let pt of palavrasTitulo) {
+                                const sim = calcularSimilaridade(pb, pt);
                                 if (sim > maxSimPalavra) maxSimPalavra = sim;
                             }
                         }
-                        notaFinal = Math.max(similaridadeTitulo, maxSimPalavra - 0.1); 
+                        notaRelevancia = Math.max(simTitulo, maxSimPalavra - 0.15);
                     }
                 }
-                
-                return { pedido, nota: notaFinal };
+
+                return { pedido, nota: notaRelevancia };
             });
 
-            const filtrados = resultadosComNota.filter(item => item.nota >= CONFIG.SIMILARIDADE_MINIMA);
-
-            filtrados.sort((a, b) => {
-                if (b.nota !== a.nota) {
-                    return b.nota - a.nota; 
-                }
-                return a.pedido.titulo.localeCompare(b.pedido.titulo); 
-            });
+            // Filtra com base na similaridade mínima configurada e ordena por relevância
+            const filtrados = resultadosAvaliados.filter(item => item.nota >= CONFIG.SIMILARIDADE_MINIMA);
+            filtrados.sort((a, b) => b.nota - a.nota);
 
             return filtrados.map(item => item.pedido);
         }
 
         // =====================================================
-        // CRUD: ADICIONAR, EDITAR, EXCLUIR, MOVER
+        // 24., 25. & 30. RENDERIZAÇÃO DA INTERFACE E CARDS (SOMENTE LEITURA)
+        // Cria os cards visuais com capas, títulos, tempo na fila e tratamento de falhas de imagem.
         // =====================================================
-        
-        function gerarIdUnico() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
+        function renderizarInterface() {
+            const grid = document.getElementById('grid-pedidos');
+            const estadoVazio = document.getElementById('estado-vazio');
+            const tituloVazioEl = document.getElementById('vazio-titulo');
+            const textoVazioEl = document.getElementById('vazio-texto');
 
-        function abrirModalFormulario(idEditar = null) {
-            const modal = document.getElementById('modal-form');
-            const content = document.getElementById('modal-form-content');
-            
-            // Limpa o formulário, INCLUINDO OS NOVOS CAMPOS
-            document.getElementById('form-pedido').reset();
-            document.getElementById('form-preview').classList.add('hidden');
-            document.getElementById('form-preview-placeholder').classList.remove('hidden');
-            document.getElementById('form-ano').value = "";
-            document.getElementById('form-comentarios').value = "";
-            
-            if (idEditar) {
-                // Modo Edição: Puxa os dados existentes, INCLUINDO OS NOVOS CAMPOS
-                document.getElementById('modal-titulo').innerText = "Editar Pedido";
-                const pedido = pedidos.find(p => p.id === idEditar);
-                if(pedido) {
-                    document.getElementById('form-id').value = pedido.id;
-                    document.getElementById('form-status').value = pedido.status;
-                    document.getElementById('form-titulo').value = pedido.titulo;
-                    document.getElementById('form-pessoa').value = pedido.solicitadoPor;
-                    document.getElementById('form-data').value = pedido.dataPedido;
-                    document.getElementById('form-imagem').value = pedido.imagem;
-                    
-                    // Preenche os campos criados, mantendo-os vazios caso sejam antigos/não tenham dados
-                    document.getElementById('form-ano').value = pedido.anoLancamento || "";
-                    document.getElementById('form-comentarios').value = pedido.comentarios || "";
-                    
-                    atualizarPreviewImagem();
-                }
-            } else {
-                document.getElementById('modal-titulo').innerText = "Novo Pedido";
-                document.getElementById('form-id').value = "";
-                document.getElementById('form-status').value = "pending";
-                
-                const hoje = new Date();
-                const dataFormatada = hoje.toISOString().split('T')[0];
-                document.getElementById('form-data').value = dataFormatada;
+            // Se nenhum arquivo foi importado ainda
+            if (todosPedidos.length === 0) {
+                grid.innerHTML = '';
+                grid.classList.add('hidden');
+                estadoVazio.classList.remove('hidden');
+                tituloVazioEl.innerText = "Nenhuma lista foi carregada";
+                textoVazioEl.innerHTML = "Para começar a consultar os desenhos, clique no botão <b>IMPORTAR XLSX</b> acima e selecione o arquivo gerado pela versão de cadastro.";
+                return;
             }
 
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
-            
-            setTimeout(() => document.getElementById('form-titulo').focus(), 100);
-        }
+            // Filtra pela aba ativa (pendentes ou não encontrados)
+            let listaFiltrada = todosPedidos.filter(p => p.status === abaAtual);
 
-        function fecharModalFormulario() {
-            const modal = document.getElementById('modal-form');
-            const content = document.getElementById('modal-form-content');
-            
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
-        function atualizarPreviewImagem() {
-            const url = document.getElementById('form-imagem').value.trim();
-            const imgEl = document.getElementById('form-preview');
-            const placeholderEl = document.getElementById('form-preview-placeholder');
-
-            if (url) {
-                imgEl.src = url;
-                imgEl.classList.remove('hidden');
-                placeholderEl.classList.remove('hidden'); // placeholder
-                placeholderEl.classList.add('hidden');
-                
-                imgEl.onerror = function() {
-                    imgEl.src = CONFIG.IMAGEM_PADRAO;
-                    mostrarNotificacao("Aviso: A imagem fornecida não pôde ser carregada.", "aviso");
-                };
+            // Aplica pesquisa inteligente se houver termo digitado
+            if (termoBusca.trim() !== '') {
+                listaFiltrada = executarPesquisaInteligente(listaFiltrada, termoBusca);
             } else {
-                imgEl.classList.add('hidden');
-                placeholderEl.classList.remove('hidden');
-            }
-        }
-
-        function verificarDuplicata(tituloNovo, idAtual) {
-            const tituloNormNovo = normalizarTexto(tituloNovo);
-            return pedidos.find(p => p.id !== idAtual && calcularSimilaridade(normalizarTexto(p.titulo), tituloNormNovo) > 0.85);
-        }
-
-        function salvarPedido(evento) {
-            evento.preventDefault(); 
-            
-            const id = document.getElementById('form-id').value;
-            const titulo = document.getElementById('form-titulo').value.trim();
-            const solicitadoPor = document.getElementById('form-pessoa').value.trim();
-            const dataPedido = document.getElementById('form-data').value;
-            const imagem = document.getElementById('form-imagem').value.trim();
-            const status = document.getElementById('form-status').value;
-            
-            // Pega os valores dos novos campos do formulário
-            const anoLancamento = document.getElementById('form-ano').value.trim();
-            const comentarios = document.getElementById('form-comentarios').value; // Mantido exatamente como digitado
-
-            const cleanTitulo = titulo.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const cleanPessoa = solicitadoPor.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-            const duplicata = verificarDuplicata(cleanTitulo, id);
-            if (duplicata && !confirm(`Já existe um pedido muito parecido: "${duplicata.titulo}".\nDeseja adicionar este mesmo assim?`)) {
-                return; 
-            }
-
-            if (id) {
-                const index = pedidos.findIndex(p => p.id === id);
-                if (index > -1) {
-                    // Estrutura atualizada para comportar anoLancamento e comentarios
-                    pedidos[index] = { id, titulo: cleanTitulo, solicitadoPor: cleanPessoa, dataPedido, anoLancamento, comentarios, imagem, status };
-                    mostrarNotificacao("Pedido atualizado com sucesso!");
-                }
-            } else {
-                // Estrutura atualizada na criação de novos
-                pedidos.push({
-                    id: gerarIdUnico(),
-                    titulo: cleanTitulo,
-                    solicitadoPor: cleanPessoa,
-                    dataPedido,
-                    anoLancamento,
-                    comentarios,
-                    imagem,
-                    status
+                // Aplicação da ordenação selecionada
+                listaFiltrada.sort((a, b) => {
+                    if (ordenacaoAtual === 'alfabetica') {
+                        return a.titulo.localeCompare(b.titulo);
+                    } else if (ordenacaoAtual === 'reversa') {
+                        return b.titulo.localeCompare(a.titulo);
+                    } else if (ordenacaoAtual === 'antigos') {
+                        return new Date(a.dataPedido) - new Date(b.dataPedido);
+                    } else if (ordenacaoAtual === 'recentes') {
+                        return new Date(b.dataPedido) - new Date(a.dataPedido);
+                    }
+                    return 0;
                 });
-                mostrarNotificacao("Novo pedido adicionado!");
-                abaAtual = 'pending';
             }
 
-            salvarDadosLocal();
-            fecharModalFormulario();
-            renderizarInterface();
-            
-            if (termoBusca) {
-                document.getElementById('input-busca').value = '';
-                termoBusca = '';
-                renderizarInterface();
+            grid.innerHTML = '';
+
+            if (listaFiltrada.length === 0) {
+                grid.classList.add('hidden');
+                estadoVazio.classList.remove('hidden');
+                tituloVazioEl.innerText = "Nenhum pedido encontrado";
+                textoVazioEl.innerText = termoBusca.trim() !== '' 
+                    ? `Nenhum resultado corresponde à sua pesquisa por "${termoBusca}". Tente outro termo.` 
+                    : "Não há pedidos nesta categoria no momento.";
+                return;
             }
+
+            grid.classList.remove('hidden');
+            estadoVazio.classList.add('hidden');
+
+            listaFiltrada.forEach(pedido => {
+                grid.innerHTML += criarHTMLCard(pedido);
+            });
         }
 
-        function editarPedido(id) {
-            abrirModalFormulario(id);
-        }
-
-        function moverPedido(id, novoStatus) {
-            const index = pedidos.findIndex(p => p.id === id);
-            if (index > -1) {
-                pedidos[index].status = novoStatus;
-                salvarDadosLocal();
-                renderizarInterface();
-                const acao = novoStatus === 'not_found' ? "Movido para Não Encontrados" : "Movido de volta para a fila";
-                mostrarNotificacao(acao);
+        function criarHTMLCard(pedido) {
+            const infoTempo = calcularTempoFila(pedido.dataPedido);
+            let corTempo = "text-slate-500 bg-slate-100";
+            
+            if (infoTempo.dias >= 30) {
+                corTempo = "text-red-700 bg-red-100 border border-red-200";
+            } else if (infoTempo.dias >= 7) {
+                corTempo = "text-amber-700 bg-amber-100 border border-amber-200";
+            } else {
+                corTempo = "text-emerald-700 bg-emerald-100 border border-emerald-200";
             }
+
+            const imagemUrl = pedido.imagem && pedido.imagem.trim() !== '' ? pedido.imagem : CONFIG.IMAGEM_PADRAO;
+            const displayAno = pedido.anoLancamento ? `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs ml-2">${pedido.anoLancamento}</span>` : "";
+            const pId = pedido.id;
+
+            // Card interativo apenas para visualização em modal de detalhes (somente leitura)
+            return `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all fade-in flex flex-col h-full group cursor-pointer hover:border-brand-300" onclick="abrirModalDetalhes('${pId}')">
+                    
+                    <!-- Capa com tag de tempo na fila -->
+                    <div class="h-52 w-full relative overflow-hidden bg-slate-100">
+                        <img src="${imagemUrl}" alt="Capa de ${pedido.titulo}" 
+                             onerror="this.onerror=null; this.src='${CONFIG.IMAGEM_PADRAO}';"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        
+                        <div class="absolute top-3 right-3 px-2.5 py-1 rounded-md text-xs font-bold shadow-sm backdrop-blur-md ${corTempo}" title="Pedido em: ${formatarDataBR(pedido.dataPedido)}">
+                            <i class="fa-regular fa-clock mr-1"></i> ${infoTempo.texto}
+                        </div>
+                    </div>
+                    
+                    <!-- Informações do Card -->
+                    <div class="p-5 flex-grow flex flex-col">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1 truncate-2-lines leading-tight" title="${pedido.titulo}">${pedido.titulo}${displayAno}</h3>
+                        
+                        <p class="text-sm text-slate-500 mb-2 flex items-center gap-1.5 mt-auto pt-2">
+                            <i class="fa-regular fa-user text-slate-400"></i>
+                            <span class="truncate">Por: <span class="font-medium text-slate-700">${pedido.solicitadoPor}</span></span>
+                        </p>
+                        
+                        <!-- Indicador discreto de consulta -->
+                        <div class="text-center mt-3 pt-3 border-t border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-brand-500 transition-colors">Clique para ver detalhes</span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
-        let acaoConfirmacaoPendente = null;
+        // =====================================================
+        // 30. MODAL DE DETALHES (SOMENTE LEITURA)
+        // Abre janela flutuante com dados completos do pedido selecionado.
+        // =====================================================
+        function abrirModalDetalhes(id) {
+            const pedido = todosPedidos.find(p => p.id === id);
+            if (!pedido) return;
 
-        function confirmarExclusao(id, titulo) {
-            const modal = document.getElementById('modal-confirmacao');
-            const content = document.getElementById('modal-confirm-content');
+            document.getElementById('detalhe-imagem').src = pedido.imagem && pedido.imagem.trim() !== '' ? pedido.imagem : CONFIG.IMAGEM_PADRAO;
+            document.getElementById('detalhe-titulo').innerText = pedido.titulo;
+            document.getElementById('detalhe-pessoa').innerText = pedido.solicitadoPor;
+            document.getElementById('detalhe-data').innerText = formatarDataBR(pedido.dataPedido);
+            document.getElementById('detalhe-ano').innerText = pedido.anoLancamento ? `Ano: ${pedido.anoLancamento}` : "Ano de lançamento não informado";
             
-            document.getElementById('modal-confirm-titulo').innerText = "Excluir Pedido";
-            document.getElementById('modal-confirm-msg').innerHTML = `Tem certeza que deseja excluir <b>${titulo}</b>?`;
+            const infoTempo = calcularTempoFila(pedido.dataPedido);
+            document.getElementById('detalhe-tempo').innerText = infoTempo.texto;
             
-            document.getElementById('modal-confirm-icon').innerHTML = '<i class="fa-solid fa-trash-can text-2xl text-red-500"></i>';
-            document.getElementById('modal-confirm-extra-botoes').classList.add('hidden');
-            
-            const btnConfirm = document.getElementById('btn-confirm-action');
-            btnConfirm.innerText = "Excluir";
-            btnConfirm.className = "flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors shadow-md shadow-red-500/30";
-            
-            acaoConfirmacaoPendente = () => {
-                pedidos = pedidos.filter(p => p.id !== id);
-                salvarDadosLocal();
-                renderizarInterface();
-                mostrarNotificacao("Pedido excluído.");
-                fecharModalConfirmacao();
-            };
-            
-            btnConfirm.onclick = acaoConfirmacaoPendente;
+            const txtStatus = pedido.status === 'pending' ? 'Na fila de pedidos' : 'Não encontrado';
+            const elStatus = document.getElementById('detalhe-status');
+            elStatus.innerText = txtStatus;
+            elStatus.className = pedido.status === 'pending' 
+                ? "font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded" 
+                : "font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded";
 
-            abrirAnimacaoModalConfirmacao(modal, content);
-        }
+            const containerComentarios = document.getElementById('detalhe-comentarios-container');
+            const textoComentarios = document.getElementById('detalhe-comentarios');
 
-        function abrirAnimacaoModalConfirmacao(modal, content) {
+            if (pedido.comentarios && pedido.comentarios.trim() !== '') {
+                textoComentarios.textContent = pedido.comentarios;
+                containerComentarios.classList.remove('hidden');
+            } else {
+                containerComentarios.classList.add('hidden');
+                textoComentarios.textContent = "";
+            }
+
+            const modal = document.getElementById('modal-detalhes');
+            const content = document.getElementById('modal-detalhes-content');
+            
             modal.classList.remove('hidden');
             setTimeout(() => {
                 content.classList.remove('scale-95', 'opacity-0');
@@ -930,19 +794,21 @@
             }, 10);
         }
 
-        function fecharModalConfirmacao() {
-            const modal = document.getElementById('modal-confirmacao');
-            const content = document.getElementById('modal-confirm-content');
+        function fecharModalDetalhes() {
+            const modal = document.getElementById('modal-detalhes');
+            const content = document.getElementById('modal-detalhes-content');
             
             content.classList.remove('scale-100', 'opacity-100');
             content.classList.add('scale-95', 'opacity-0');
             
             setTimeout(() => {
                 modal.classList.add('hidden');
-                acaoConfirmacaoPendente = null;
             }, 300);
         }
 
+        // =====================================================
+        // SISTEMA DE NOTIFICAÇÕES TOAST
+        // =====================================================
         function mostrarNotificacao(mensagem, tipo = 'sucesso') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
@@ -957,184 +823,10 @@
             }
 
             toast.classList.remove('translate-y-20', 'opacity-0');
-            
             setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            }, 4000);
         }
-
-        // =====================================================
-        // EXPORTAÇÃO E IMPORTAÇÃO (Excel .XLSX via SheetJS)
-        // =====================================================
-        
-        /*
-         * COMO SÃO EXPORTADOS PARA XLSX:
-         * A função mapeia (transforma) a lista 'pedidos' que temos na memória criando colunas em português legível.
-         * Adicionamos "Ano de lançamento" e "Comentários" à regra do SheetJS. O operador '|| ""' garante que não exportaremos a palavra "undefined" caso algum campo esteja vazio.
-         */
-        function exportarXLSX() {
-            if (pedidos.length === 0) {
-                mostrarNotificacao("A lista está vazia. Não há o que exportar.", "aviso");
-                return;
-            }
-
-            try {
-                const dadosExcel = pedidos.map(p => ({
-                    "ID do Sistema": p.id, 
-                    "Título": p.titulo,
-                    "Pedido por": p.solicitadoPor,
-                    "Data do pedido": p.dataPedido,
-                    "Ano de lançamento": p.anoLancamento || '', // Inclui a nova coluna
-                    "Comentários": p.comentarios || '', // Inclui a nova coluna
-                    "Status": p.status === 'pending' ? 'Fila' : 'Não Encontrado',
-                    "URL da Imagem": p.imagem || ''
-                }));
-
-                const worksheet = XLSX.utils.json_to_sheet(dadosExcel);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Pedidos");
-
-                XLSX.writeFile(workbook, CONFIG.NOME_ARQUIVO_EXPORTACAO);
-                mostrarNotificacao("Lista exportada com sucesso!");
-
-            } catch (erro) {
-                console.error("Erro na exportação:", erro);
-                mostrarNotificacao("Ocorreu um erro ao exportar o arquivo.", "erro");
-            }
-        }
-
-        let arquivoUploadPendente = null;
-
-        function processarArquivoXLSX(evento) {
-            const arquivo = evento.target.files[0];
-            if (!arquivo) return;
-
-            arquivoUploadPendente = arquivo;
-
-            evento.target.value = '';
-
-            const modal = document.getElementById('modal-confirmacao');
-            const content = document.getElementById('modal-confirm-content');
-            
-            document.getElementById('modal-confirm-titulo').innerText = "Importar Planilha";
-            document.getElementById('modal-confirm-msg').innerHTML = "Como deseja proceder com a importação?";
-            
-            document.getElementById('modal-confirm-icon').innerHTML = '<i class="fa-solid fa-file-import text-2xl text-brand-500"></i>';
-            
-            document.getElementById('modal-confirm-extra-botoes').classList.remove('hidden');
-            
-            const btnConfirm = document.getElementById('btn-confirm-action');
-            btnConfirm.innerText = "Substituir Tudo";
-            btnConfirm.className = "flex-1 px-4 py-2 bg-brand-500 text-white rounded-lg font-medium hover:bg-brand-600 transition-colors shadow-md shadow-brand-500/30";
-            
-            btnConfirm.onclick = () => executarImportacao(true);
-            
-            document.getElementById('btn-import-mesclar').onclick = () => executarImportacao(false);
-
-            abrirAnimacaoModalConfirmacao(modal, content);
-        }
-
-        /*
-         * COMO SÃO IMPORTADOS DO XLSX:
-         * Ao varrer o arquivo importado, a função 'acharColuna' busca nomes aproximados das colunas.
-         * Adicionamos a inteligência para reconhecer palavras como "lançamento" e "comentários", puxando essa informação
-         * sem quebrar caso seja um arquivo antigo (pois ele simplesmente preencherá vazio usando o operador '|| ""').
-         */
-        function executarImportacao(substituir) {
-            fecharModalConfirmacao();
-            if (!arquivoUploadPendente) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    
-                    const nomePrimeiraAba = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[nomePrimeiraAba];
-                    
-                    const rawJson = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-                    
-                    if (rawJson.length === 0) {
-                        mostrarNotificacao("O arquivo está vazio.", "erro");
-                        return;
-                    }
-
-                    let novosPedidos = [];
-                    
-                    rawJson.forEach(linha => {
-                        const chaves = Object.keys(linha);
-                        const acharColuna = (termos) => {
-                            const chaveEncontrada = chaves.find(c => {
-                                const cNorm = normalizarTexto(c);
-                                return termos.some(t => cNorm.includes(t));
-                            });
-                            return chaveEncontrada ? linha[chaveEncontrada] : "";
-                        };
-
-                        const id = acharColuna(["id do sistema", "id", "codigo"]) || gerarIdUnico();
-                        const titulo = acharColuna(["titulo", "nome", "desenho", "filme"]) || "Sem Título";
-                        const solicitadoPor = acharColuna(["pedido por", "solicitado", "usuario", "pessoa"]) || "Desconhecido";
-                        let dataPedido = acharColuna(["data"]);
-                        
-                        // Reconhece as novas colunas
-                        const anoLancamento = acharColuna(["ano de lançamento", "ano de lancamento", "ano"]) || "";
-                        const comentarios = acharColuna(["comentários", "comentarios", "comentario", "obs", "observacao"]) || "";
-                        
-                        const imagem = acharColuna(["url", "imagem", "capa", "foto"]);
-                        const statusCru = acharColuna(["status", "estado"]);
-
-                        let status = 'pending';
-                        if (normalizarTexto(statusCru).includes("nao encontra")) {
-                            status = 'not_found';
-                        }
-
-                        if (dataPedido && String(dataPedido).includes('/')) {
-                            const partes = dataPedido.split('/');
-                            if(partes.length === 3) {
-                                dataPedido = `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
-                            }
-                        } else if (!dataPedido) {
-                            dataPedido = new Date().toISOString().split('T')[0];
-                        }
-                        
-                        // Insere os novos campos na estrutura final para serem processados
-                        novosPedidos.push({ id, titulo, solicitadoPor, dataPedido, anoLancamento, comentarios, imagem, status });
-                    });
-
-                    if (substituir) {
-                        pedidos = novosPedidos;
-                        mostrarNotificacao(`${novosPedidos.length} pedidos substituídos com sucesso!`);
-                    } else {
-                        let adicionados = 0;
-                        let atualizados = 0;
-                        
-                        novosPedidos.forEach(np => {
-                            const indexExistente = pedidos.findIndex(p => p.id === np.id);
-                            if (indexExistente > -1) {
-                                pedidos[indexExistente] = np;
-                                atualizados++;
-                            } else {
-                                pedidos.push(np);
-                                adicionados++;
-                            }
-                        });
-                        mostrarNotificacao(`Importado: ${adicionados} novos, ${atualizados} atualizados.`);
-                    }
-
-                    salvarDadosLocal();
-                    renderizarInterface();
-
-                } catch (erro) {
-                    console.error("Erro na leitura do arquivo:", erro);
-                    mostrarNotificacao("Erro: Verifique se o arquivo é um XLSX válido.", "erro");
-                }
-            };
-            
-            reader.readAsArrayBuffer(arquivoUploadPendente);
-            arquivoUploadPendente = null; 
-        }
-
     </script>
 </body>
 </html>
